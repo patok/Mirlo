@@ -48,9 +48,16 @@ public class HomeActivity extends Activity {
 		protected void onPostExecute(List<twitter4j.Status> result) {
 			super.onPostExecute(result);
 
+			List<String> data = new LinkedList<String>();
+			for (twitter4j.Status status : result) {
+				data.add(status.getUser().getScreenName() + " :: "
+						+ status.getText());
+			}
+
 			ListView listView = (ListView) findViewById(R.id.listView1);
-			ArrayAdapter<twitter4j.Status> adapter = new ArrayAdapter<twitter4j.Status>(
-					HomeActivity.this, R.layout.list_item_layout, result);
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+					HomeActivity.this, R.layout.list_item_layout, data);
+
 			listView.setAdapter(adapter);
 		}
 
