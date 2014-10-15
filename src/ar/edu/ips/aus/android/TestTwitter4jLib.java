@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import twitter4j.RateLimitStatus;
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -36,6 +37,10 @@ public class TestTwitter4jLib {
 		private final String SCREEN_SEPARATOR = "========================================";
 		private Twitter twitter;
 		private String screenName;
+
+		public List<Status> getHomeTimeLine() throws TwitterException {
+			return twitter.getHomeTimeline();
+		}
 
 		public String buildHomeTimelineOutput() throws TwitterException {
 			List<twitter4j.Status> statuses = twitter.getHomeTimeline();
