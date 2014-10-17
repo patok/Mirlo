@@ -3,5 +3,6 @@
 
     <string name="app_name">Mirlo</string>
     <string name="hello_world">Aquí se deben mostrar los tweets!</string>
+    <string name="thumbnail_description">user profile image thumbnail</string>
 
 </resources>

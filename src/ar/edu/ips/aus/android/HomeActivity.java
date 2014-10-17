@@ -89,9 +89,10 @@ public class HomeActivity extends Activity {
 				reusableView = getLayoutInflater().inflate(
 						R.layout.list_item_layout, null);
 			}
-			TextView textView = (TextView) reusableView;
-			textView.setText(data.get(position).getText());
-			return textView;
+			TextView textView = (TextView) (reusableView.findViewById(R.id.text1));
+			textView.setText(data.get(position).getUser().getScreenName()
+					+ " :: " + data.get(position).getText());
+			return reusableView;
 		}
 
 	}
