@@ -4,5 +4,10 @@
     <string name="app_name">Mirlo</string>
     <string name="hello_world">Aquí se deben mostrar los tweets!</string>
     <string name="thumbnail_description">user profile image thumbnail</string>
+    <string name="OAuthConsumerKey">OAuth Consumer Key</string>
+    <string name="OAuthConsumerSecret">OAuth Consumer Secret</string>
+    <string name="OAuthAccessToken">OAuth Access Token</string>
+    <string name="OAuthAccessTokenSecret">OAuth Access Token Secret</string>
+    <string name="title_activity_prefs">Preferencias</string>
 
 </resources>

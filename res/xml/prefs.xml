@@ -1,0 +1,6 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<EditTextPreference android:title="@string/OAuthConsumerKey" android:key="OAuthConsumerKey"/>
+    <EditTextPreference android:title="@string/OAuthConsumerSecret" android:key="OAuthConsumerSecret"/>
+	<EditTextPreference android:title="@string/OAuthAccessToken" android:key="OAuthAccessToken"/>
+    <EditTextPreference android:title="@string/OAuthAccessTokenSecret" android:key="OAuthAccessTokenSecret"/>
+</PreferenceScreen>

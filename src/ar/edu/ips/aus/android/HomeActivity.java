@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import ar.edu.ips.android.R;
 import ar.edu.ips.aus.android.TestTwitter4jLib.TwitterTest;
 
 public class HomeActivity extends Activity {

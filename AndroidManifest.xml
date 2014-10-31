@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ar.edu.ips.android"
+    package="ar.edu.ips.aus.android"
     android:versionCode="1"
     android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="12"
         android:targetSdkVersion="19" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -17,6 +18,10 @@
         <activity
             android:name="ar.edu.ips.aus.android.HomeActivity"
             android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="ar.edu.ips.aus.android.PrefsActivity"
+            android:label="@string/title_activity_prefs" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
