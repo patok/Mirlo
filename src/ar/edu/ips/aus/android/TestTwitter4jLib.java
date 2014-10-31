@@ -18,7 +18,7 @@ public class TestTwitter4jLib {
 	public static void main(String[] args) {
 		TwitterTest tt = new TestTwitter4jLib.TwitterTest();
 		try {
-			tt.init();
+			tt.init(null, null, null, null);
 
 			out.println(tt.buildUsernameOutput());
 
@@ -80,15 +80,14 @@ public class TestTwitter4jLib {
 			return buff.toString();
 		}
 
-		public void init() {
+		public void init(String oAuthConsumerKey, String oAuthConsumerSecret,
+				String oAuthAccessToken, String oAuthAccessTokenSecret) {
 			ConfigurationBuilder cb = new ConfigurationBuilder();
-			cb.setOAuthConsumerKey("RYur1bWtcK187eci5c5X13dNe")
-					.setOAuthConsumerSecret(
-							"1uMhV4ap3xJ7gj0mF7eFrQIxbo2uqHKtNv37lOrXjLDZPWzOhN")
-					.setOAuthAccessToken(
-							"188022802-NlPKGFo5i8id6BRgyPjIoYZTYL2KTfohEqGioNM6")
-					.setOAuthAccessTokenSecret(
-							"2OOBlYMYtTg51jDtdlU7CxerP6noc9vkAldb8I8X5HQNQ");
+
+			cb.setOAuthConsumerKey(oAuthConsumerKey)
+					.setOAuthConsumerSecret(oAuthConsumerSecret)
+					.setOAuthAccessToken(oAuthAccessToken)
+					.setOAuthAccessTokenSecret(oAuthAccessTokenSecret);
 
 			screenName = "ips_aus";
 

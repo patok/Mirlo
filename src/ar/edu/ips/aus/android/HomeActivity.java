@@ -8,10 +8,12 @@ import java.util.List;
 import twitter4j.Status;
 import twitter4j.TwitterException;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.View;
@@ -34,7 +36,12 @@ public class HomeActivity extends Activity {
 		setContentView(R.layout.activity_home);
 
 		twitterTest = new TestTwitter4jLib.TwitterTest();
-		twitterTest.init();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+		twitterTest.init(prefs.getString("OAuthConsumerKey", ""),
+				prefs.getString("OAuthConsumerSecret", ""),
+				prefs.getString("OAuthAccessToken", ""),
+				prefs.getString("OAuthAccessTokenSecret", ""));
 
 		//
 		// LruCache sample code from
