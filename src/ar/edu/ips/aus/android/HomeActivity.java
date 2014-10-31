@@ -8,7 +8,11 @@ import java.util.List;
 import twitter4j.Status;
 import twitter4j.TwitterException;
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -29,11 +33,14 @@ public class HomeActivity extends Activity {
 
 	private TwitterTest twitterTest;
 	private LruCache<String, Bitmap> imageMemoryCache;
+	private DBHelper dbHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
+
+		dbHelper = new DBHelper(this);
 
 		twitterTest = new TestTwitter4jLib.TwitterTest();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -81,6 +88,7 @@ public class HomeActivity extends Activity {
 		protected List<twitter4j.Status> doInBackground(Void... params) {
 			try {
 				return twitterTest.getHomeTimeLine();
+				// TODO insert tweets data into db
 			} catch (TwitterException e) {
 				Log.e(TAG, e.getErrorMessage());
 				return null;
@@ -92,6 +100,11 @@ public class HomeActivity extends Activity {
 			super.onPostExecute(result);
 
 			ListView listView = (ListView) findViewById(R.id.listView1);
+
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
+			db.close();
+
+			// TODO use CursorAdapter/Cursor to read status data from db and into the listView 
 			StatusAdapter adapter = new StatusAdapter(result);
 
 			listView.setAdapter(adapter);
@@ -180,5 +193,34 @@ public class HomeActivity extends Activity {
 				}
 			}
 		}
+	}
+
+	class DBHelper extends SQLiteOpenHelper {
+
+		private static final String DB_NAME = "tweets.db";
+		private static final int VERSION = 1;
+		public static final String TABLE_NAME = "tweet";
+		public static final String ID = "_id";
+		public static final String USER_NAME = "user_name";
+		public static final String TWEET_TEXT = "tweet_text";
+		private static final String IMAGE_PROFILE_URL = "image_profile_url";
+
+		public DBHelper(Context context) {
+			super(context, DB_NAME, null, VERSION);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			String createDbSql = "CREATE TABLE " + TABLE_NAME + " (" 
+					+ ID + " int primary key, " + USER_NAME + " text," 
+					+ TWEET_TEXT + " text, " + IMAGE_PROFILE_URL + " text )";
+			db.execSQL(createDbSql);
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			// TODO Auto-generated method stub
+		}
+
 	}
 }
