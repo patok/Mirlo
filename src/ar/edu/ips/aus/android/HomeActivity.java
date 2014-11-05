@@ -8,16 +8,18 @@ import java.util.List;
 import twitter4j.Status;
 import twitter4j.TwitterException;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.View;
@@ -26,6 +28,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import ar.edu.ips.aus.android.TestTwitter4jLib.TwitterTest;
 
@@ -80,83 +83,76 @@ public class HomeActivity extends Activity {
 		return imageMemoryCache.get(key);
 	}
 
-	class RetrieveTweets extends AsyncTask<Void, Void, List<Status>> {
+	class RetrieveTweets extends AsyncTask<Void, Void, Void> {
 
 		private static final String TAG = "TwitterTests";
 
 		@Override
-		protected List<twitter4j.Status> doInBackground(Void... params) {
+		protected Void doInBackground(Void... params) {
 			try {
-				return twitterTest.getHomeTimeLine();
-				// TODO insert tweets data into db
+				List<twitter4j.Status> result = twitterTest.getHomeTimeLine();
+				SQLiteDatabase db = dbHelper.getWritableDatabase();
+				ContentValues values = new ContentValues();
+				for (twitter4j.Status status : result) {
+					values.put(dbHelper.ID, status.getId());
+					values.put(dbHelper.USER_NAME, status.getUser().getName());
+					values.put(dbHelper.TWEET_TEXT, status.getText());
+					values.put(dbHelper.IMAGE_PROFILE_URL, status.getUser().getMiniProfileImageURL());
+					db.insert(dbHelper.TABLE_NAME, null, values);
+				}
+				db.close();
 			} catch (TwitterException e) {
 				Log.e(TAG, e.getErrorMessage());
-				return null;
 			}
+			return null;
 		}
 
 		@Override
-		protected void onPostExecute(List<twitter4j.Status> result) {
+		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 
 			ListView listView = (ListView) findViewById(R.id.listView1);
 
 			SQLiteDatabase db = dbHelper.getReadableDatabase();
-			db.close();
-
-			// TODO use CursorAdapter/Cursor to read status data from db and into the listView 
-			StatusAdapter adapter = new StatusAdapter(result);
+			
+			Cursor cursor = db.query(DBHelper.TABLE_NAME, null, null, null, null, null, null);
+			startManagingCursor(cursor);
+			String[] from = new String[]{DBHelper.TWEET_TEXT};
+			int[] to = new int[]{R.id.text1};
+			StatusAdapter adapter = new StatusAdapter(HomeActivity.this, R.layout.list_item_layout, cursor, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
 			listView.setAdapter(adapter);
 		}
 
 	}
 
-	class StatusAdapter extends BaseAdapter implements ListAdapter {
+	class StatusAdapter extends SimpleCursorAdapter implements ListAdapter {
 
-		private final List<Status> data;
+		private Cursor cursor;
 
-		public StatusAdapter(List<Status> data) {
-			this.data = data;
+		public StatusAdapter(Context context, int layout, Cursor cursor, String[] from, int[] to, int flags) {
+			super(context, layout, cursor, from, to, flags);
+			this.cursor = cursor;
 		}
 
 		@Override
-		public int getCount() {
-			return data.size();
-		}
+		public void bindView(View view, Context context, Cursor cursor) {
+			super.bindView(view, context, cursor);
+			
+			TextView textView = (TextView) (view.findViewById(R.id.text1));
+			textView.setText(cursor.getString(cursor.getColumnIndex(DBHelper.USER_NAME))
+					+ " :: " + cursor.getString(cursor.getColumnIndex(DBHelper.TWEET_TEXT)));
 
-		@Override
-		public Object getItem(int position) {
-			return data.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return data.get(position).getId();
-		}
-
-		@Override
-		public View getView(int position, View reusableView,
-				ViewGroup parentView) {
-			if (reusableView == null) {
-				reusableView = getLayoutInflater().inflate(R.layout.list_item_layout, null);
-			}
-			Status status = data.get(position);
-
-			TextView textView = (TextView) (reusableView.findViewById(R.id.text1));
-			textView.setText(status.getUser().getScreenName() + " :: " + status.getText());
-
-			ImageView imageView = (ImageView) reusableView.findViewById(R.id.imageView1);
-			final Bitmap bitmap = getBitmapFromMemCache(status.getUser().getMiniProfileImageURL());
+			ImageView imageView = (ImageView) view.findViewById(R.id.imageView1);
+			String profileImageUrl = cursor.getString(cursor.getColumnIndex(dbHelper.IMAGE_PROFILE_URL));
+			final Bitmap bitmap = getBitmapFromMemCache(profileImageUrl);
 			if (bitmap != null) {
 				imageView.setImageBitmap(bitmap);
 			} else {
 				BitmapDownloaderTask task = new BitmapDownloaderTask(imageView);
-				task.execute(status.getUser().getMiniProfileImageURL());
+				task.execute(profileImageUrl);
 			}
-			return reusableView;
 		}
-
 	}
 
 	class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
