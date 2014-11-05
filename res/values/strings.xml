@@ -9,5 +9,7 @@
     <string name="OAuthAccessToken">OAuth Access Token</string>
     <string name="OAuthAccessTokenSecret">OAuth Access Token Secret</string>
     <string name="title_activity_prefs">Preferencias</string>
+    <string name="menu_prefs_title">Preferences</string>
+    <string name="menu_refresh_title">Refresh</string>
 
 </resources>

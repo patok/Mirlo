@@ -86,16 +86,19 @@ public class HomeActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	        case R.id.menu_preferences:
-	        	// calling PrefsActivity explicitly!
-	        	Intent prefsIntent = new Intent(this, PrefsActivity.class);
-	        	startActivity(prefsIntent);
-	            return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.menu_preferences:
+			// calling PrefsActivity explicitly!
+			Intent prefsIntent = new Intent(this, PrefsActivity.class);
+			startActivity(prefsIntent);
+			return true;
+		case R.id.menu_refresh:
+			// refresh data
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	private void addBitmapToMemoryCache(String key, Bitmap bitmap) {
