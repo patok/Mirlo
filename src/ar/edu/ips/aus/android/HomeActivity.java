@@ -22,6 +22,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -73,13 +75,21 @@ public class HomeActivity extends Activity {
 
 	}
 
-	public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.options_menu, menu);
+	    return true;
+	}
+
+
+	private void addBitmapToMemoryCache(String key, Bitmap bitmap) {
 		if (getBitmapFromMemCache(key) == null) {
 			imageMemoryCache.put(key, bitmap);
 		}
 	}
 
-	public Bitmap getBitmapFromMemCache(String key) {
+	private Bitmap getBitmapFromMemCache(String key) {
 		return imageMemoryCache.get(key);
 	}
 
