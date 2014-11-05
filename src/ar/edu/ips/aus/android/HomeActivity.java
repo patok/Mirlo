@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
@@ -113,10 +114,11 @@ public class HomeActivity extends Activity {
 
 	class RetrieveTweets extends AsyncTask<Void, Void, Void> {
 
-		private static final String TAG = "TwitterTests";
+		private static final String TAG = "RetrieveTweets";
 
 		@Override
 		protected Void doInBackground(Void... params) {
+			Log.d(TAG, "Getting user's home timeline and inserting tweets into db.");
 			try {
 				List<twitter4j.Status> result = twitterTest.getHomeTimeLine();
 				SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -126,7 +128,12 @@ public class HomeActivity extends Activity {
 					values.put(dbHelper.USER_NAME, status.getUser().getName());
 					values.put(dbHelper.TWEET_TEXT, status.getText());
 					values.put(dbHelper.IMAGE_PROFILE_URL, status.getUser().getMiniProfileImageURL());
-					db.insert(dbHelper.TABLE_NAME, null, values);
+					try {
+						db.insertOrThrow(dbHelper.TABLE_NAME, null, values);
+					} catch (SQLException e) {
+						// log and do nothing else
+						Log.d(TAG, "An sql error happened", e);
+					}
 				}
 				db.close();
 			} catch (TwitterException e) {
@@ -143,6 +150,7 @@ public class HomeActivity extends Activity {
 
 			SQLiteDatabase db = dbHelper.getReadableDatabase();
 			
+			Log.d(TAG, "Getting user's home timeline and retrieving tweets from db.");
 			Cursor cursor = db.query(DBHelper.TABLE_NAME, null, null, null, null, null, null);
 			startManagingCursor(cursor);
 			String[] from = new String[]{DBHelper.TWEET_TEXT};
