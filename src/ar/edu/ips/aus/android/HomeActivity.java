@@ -137,7 +137,7 @@ public class HomeActivity extends Activity {
 				}
 				db.close();
 			} catch (TwitterException e) {
-				Log.e(TAG, e.getErrorMessage());
+				Log.e(TAG, "Error trying to retrieve tweets");
 			}
 			return null;
 		}
