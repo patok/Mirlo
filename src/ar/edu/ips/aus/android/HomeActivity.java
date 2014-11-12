@@ -32,7 +32,8 @@ import ar.edu.ips.aus.android.MirloApplication.DBHelper;
 
 public class HomeActivity extends Activity {
 
-	MirloApplication app;
+	private MirloApplication app;
+	private SQLiteDatabase db;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +41,33 @@ public class HomeActivity extends Activity {
 		setContentView(R.layout.activity_home);
 
 		this.app = (MirloApplication) getApplication();
-
-		new RetrieveTweets().execute();
-
+		db = app.getDbHelper().getReadableDatabase();
 	}
+
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		Cursor cursor = db.query(DBHelper.TABLE_NAME, null, null, null, null, null, null);
+		startManagingCursor(cursor);
+		String[] from = new String[]{DBHelper.TWEET_TEXT};
+		int[] to = new int[]{R.id.text1};
+		StatusAdapter adapter = new StatusAdapter(HomeActivity.this, R.layout.list_item_layout, cursor,
+				from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+		ListView listView = (ListView) findViewById(R.id.listView1);
+		listView.setAdapter(adapter);
+	}
+
+	
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		db.close();
+	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -85,55 +109,6 @@ public class HomeActivity extends Activity {
 		return app.getImageMemoryCache().get(key);
 	}
 
-	class RetrieveTweets extends AsyncTask<Void, Void, Void> {
-
-		private static final String TAG = "RetrieveTweets";
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			Log.d(TAG, "Getting user's home timeline and inserting tweets into db.");
-			try {
-				List<twitter4j.Status> result = app.getTwitter().getHomeTimeline();
-				SQLiteDatabase db = app.getDbHelper().getWritableDatabase();
-				ContentValues values = new ContentValues();
-				for (twitter4j.Status status : result) {
-					values.put(DBHelper.ID, status.getId());
-					values.put(DBHelper.USER_NAME, status.getUser().getName());
-					values.put(DBHelper.TWEET_TEXT, status.getText());
-					values.put(DBHelper.IMAGE_PROFILE_URL, status.getUser().getMiniProfileImageURL());
-					try {
-						db.insertOrThrow(DBHelper.TABLE_NAME, null, values);
-					} catch (SQLException e) {
-						// log and do nothing else
-						Log.d(TAG, "An sql error happened", e);
-					}
-				}
-				db.close();
-			} catch (TwitterException e) {
-				Log.e(TAG, "Error trying to retrieve tweets");
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-
-			ListView listView = (ListView) findViewById(R.id.listView1);
-
-			SQLiteDatabase db = app.getDbHelper().getReadableDatabase();
-			
-			Log.d(TAG, "Getting user's home timeline and retrieving tweets from db.");
-			Cursor cursor = db.query(DBHelper.TABLE_NAME, null, null, null, null, null, null);
-			startManagingCursor(cursor);
-			String[] from = new String[]{DBHelper.TWEET_TEXT};
-			int[] to = new int[]{R.id.text1};
-			StatusAdapter adapter = new StatusAdapter(HomeActivity.this, R.layout.list_item_layout, cursor, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-
-			listView.setAdapter(adapter);
-		}
-
-	}
 
 	class StatusAdapter extends SimpleCursorAdapter implements ListAdapter {
 
