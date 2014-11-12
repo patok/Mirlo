@@ -5,74 +5,41 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.List;
 
-import twitter4j.Status;
 import twitter4j.TwitterException;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import ar.edu.ips.aus.android.TestTwitter4jLib.TwitterTest;
+import ar.edu.ips.aus.android.MirloApplication.DBHelper;
 
 public class HomeActivity extends Activity {
 
-	private TwitterTest twitterTest;
-	private LruCache<String, Bitmap> imageMemoryCache;
-	private DBHelper dbHelper;
+	MirloApplication app;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 
-		dbHelper = new DBHelper(this);
-
-		twitterTest = new TestTwitter4jLib.TwitterTest();
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-		twitterTest.init(prefs.getString("OAuthConsumerKey", ""),
-				prefs.getString("OAuthConsumerSecret", ""),
-				prefs.getString("OAuthAccessToken", ""),
-				prefs.getString("OAuthAccessTokenSecret", ""));
-
-		//
-		// LruCache sample code from
-		// http://developer.android.com/intl/es/training/displaying-bitmaps/cache-bitmap.html
-		//
-		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-		final int cacheSize = maxMemory / 8;
-
-		imageMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
-			@Override
-			protected int sizeOf(String key, Bitmap bitmap) {
-				// The cache size will be measured in kilobytes rather than
-				// number of items.
-				return bitmap.getByteCount() / 1024;
-			}
-		};
+		this.app = (MirloApplication) getApplication();
 
 		new RetrieveTweets().execute();
 
@@ -104,12 +71,12 @@ public class HomeActivity extends Activity {
 
 	private void addBitmapToMemoryCache(String key, Bitmap bitmap) {
 		if (getBitmapFromMemCache(key) == null) {
-			imageMemoryCache.put(key, bitmap);
+			app.getImageMemoryCache().put(key, bitmap);
 		}
 	}
 
 	private Bitmap getBitmapFromMemCache(String key) {
-		return imageMemoryCache.get(key);
+		return app.getImageMemoryCache().get(key);
 	}
 
 	class RetrieveTweets extends AsyncTask<Void, Void, Void> {
@@ -120,16 +87,16 @@ public class HomeActivity extends Activity {
 		protected Void doInBackground(Void... params) {
 			Log.d(TAG, "Getting user's home timeline and inserting tweets into db.");
 			try {
-				List<twitter4j.Status> result = twitterTest.getHomeTimeLine();
-				SQLiteDatabase db = dbHelper.getWritableDatabase();
+				List<twitter4j.Status> result = app.getTwitter().getHomeTimeline();
+				SQLiteDatabase db = app.getDbHelper().getWritableDatabase();
 				ContentValues values = new ContentValues();
 				for (twitter4j.Status status : result) {
-					values.put(dbHelper.ID, status.getId());
-					values.put(dbHelper.USER_NAME, status.getUser().getName());
-					values.put(dbHelper.TWEET_TEXT, status.getText());
-					values.put(dbHelper.IMAGE_PROFILE_URL, status.getUser().getMiniProfileImageURL());
+					values.put(DBHelper.ID, status.getId());
+					values.put(DBHelper.USER_NAME, status.getUser().getName());
+					values.put(DBHelper.TWEET_TEXT, status.getText());
+					values.put(DBHelper.IMAGE_PROFILE_URL, status.getUser().getMiniProfileImageURL());
 					try {
-						db.insertOrThrow(dbHelper.TABLE_NAME, null, values);
+						db.insertOrThrow(DBHelper.TABLE_NAME, null, values);
 					} catch (SQLException e) {
 						// log and do nothing else
 						Log.d(TAG, "An sql error happened", e);
@@ -148,7 +115,7 @@ public class HomeActivity extends Activity {
 
 			ListView listView = (ListView) findViewById(R.id.listView1);
 
-			SQLiteDatabase db = dbHelper.getReadableDatabase();
+			SQLiteDatabase db = app.getDbHelper().getReadableDatabase();
 			
 			Log.d(TAG, "Getting user's home timeline and retrieving tweets from db.");
 			Cursor cursor = db.query(DBHelper.TABLE_NAME, null, null, null, null, null, null);
@@ -180,7 +147,7 @@ public class HomeActivity extends Activity {
 					+ " :: " + cursor.getString(cursor.getColumnIndex(DBHelper.TWEET_TEXT)));
 
 			ImageView imageView = (ImageView) view.findViewById(R.id.imageView1);
-			String profileImageUrl = cursor.getString(cursor.getColumnIndex(dbHelper.IMAGE_PROFILE_URL));
+			String profileImageUrl = cursor.getString(cursor.getColumnIndex(DBHelper.IMAGE_PROFILE_URL));
 			final Bitmap bitmap = getBitmapFromMemCache(profileImageUrl);
 			if (bitmap != null) {
 				imageView.setImageBitmap(bitmap);
@@ -227,32 +194,4 @@ public class HomeActivity extends Activity {
 		}
 	}
 
-	class DBHelper extends SQLiteOpenHelper {
-
-		private static final String DB_NAME = "tweets.db";
-		private static final int VERSION = 1;
-		public static final String TABLE_NAME = "tweet";
-		public static final String ID = "_id";
-		public static final String USER_NAME = "user_name";
-		public static final String TWEET_TEXT = "tweet_text";
-		private static final String IMAGE_PROFILE_URL = "image_profile_url";
-
-		public DBHelper(Context context) {
-			super(context, DB_NAME, null, VERSION);
-		}
-
-		@Override
-		public void onCreate(SQLiteDatabase db) {
-			String createDbSql = "CREATE TABLE " + TABLE_NAME + " (" 
-					+ ID + " int primary key, " + USER_NAME + " text," 
-					+ TWEET_TEXT + " text, " + IMAGE_PROFILE_URL + " text )";
-			db.execSQL(createDbSql);
-		}
-
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			// TODO Auto-generated method stub
-		}
-
-	}
 }
