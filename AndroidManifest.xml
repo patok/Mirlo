@@ -28,6 +28,7 @@
             android:name=".PrefsActivity"
             android:label="@string/title_activity_prefs" >
         </activity>
+        <service android:name=".MirloService"></service>
     </application>
 
 </manifest>

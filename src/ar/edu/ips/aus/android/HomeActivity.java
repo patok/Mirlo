@@ -64,6 +64,12 @@ public class HomeActivity extends Activity {
 		case R.id.menu_refresh:
 			// refresh data
 			return true;
+		case R.id.menu_service_start:
+			startService(new Intent(this, MirloService.class));
+			return true;
+		case R.id.menu_service_stop:
+			stopService(new Intent(this, MirloService.class));
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

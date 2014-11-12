@@ -12,5 +12,15 @@
         android:title="@string/menu_refresh_title"
         android:showAsAction="ifRoom">
     </item>
-
+    <item
+        android:id="@+id/menu_service_start"
+        android:icon="@android:drawable/ic_media_play"
+        android:title="@string/menu_service_start">
+    </item>
+    <item
+        android:id="@+id/menu_service_stop"
+        android:icon="@android:drawable/ic_media_pause"
+        android:title="@string/menu_service_stop">
+    </item>
+    
 </menu>

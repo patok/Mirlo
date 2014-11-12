@@ -11,5 +11,7 @@
     <string name="title_activity_prefs">Preferencias</string>
     <string name="menu_prefs_title">Preferences</string>
     <string name="menu_refresh_title">Refresh</string>
+    <string name="menu_service_start">Start Service</string>
+    <string name="menu_service_stop">Stop Service</string>
 
 </resources>
