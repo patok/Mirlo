@@ -86,6 +86,10 @@ public class MirloService extends Service {
 					Log.d(TAG, "Updated tweets from service");
 				} catch (TwitterException e) {
 					Log.e(TAG, "Error trying to retrieve tweets");
+				} finally {
+					if (db != null) {
+						db.close();
+					}
 				}
 				
 				try {
