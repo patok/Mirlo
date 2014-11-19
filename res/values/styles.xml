@@ -24,4 +24,7 @@
         <item name="android:colorBackground">@color/custom_theme_color</item>
     </style>
 
+    <style name="activity">
+        <item name="android:background">@drawable/blackbird</item>
+    </style>
 </resources>
