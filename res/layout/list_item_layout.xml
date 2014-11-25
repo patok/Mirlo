@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-        android:paddingStart="?android:attr/listPreferredItemPaddingStart" />
-
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart" 
+        style="@style/colored_text"/>
+	
 </LinearLayout>

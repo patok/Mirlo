@@ -26,5 +26,12 @@
 
     <style name="activity">
         <item name="android:background">@drawable/blackbird</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">match_parent</item>
     </style>
+    
+    <style name="colored_text">
+        <item name="android:textColor">@android:color/holo_orange_light</item>
+    </style>
+    
 </resources>
