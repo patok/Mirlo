@@ -3,3 +3,12 @@
 bin/
 target/
 gen/
+/.idea/
+/build
+/app/build
+/gradle
+*.iml
+.gradle
+gradle.properties
+gradlew
+gradlew.bat
