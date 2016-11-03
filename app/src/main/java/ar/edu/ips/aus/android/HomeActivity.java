@@ -34,6 +34,7 @@ public class HomeActivity extends Activity {
 
 	private MirloApplication app;
 	private SQLiteDatabase db;
+	private StatusAdapter adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,31 +42,37 @@ public class HomeActivity extends Activity {
 		setContentView(R.layout.activity_home);
 
 		this.app = (MirloApplication) getApplication();
-		db = app.getDbHelper().getReadableDatabase();
+
 	}
 
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
+        db = app.getDbHelper().getReadableDatabase();
 		Cursor cursor = db.query(DBHelper.TABLE_NAME, null, null, null, null, null, null);
 		startManagingCursor(cursor);
 		String[] from = new String[]{DBHelper.TWEET_TEXT};
 		int[] to = new int[]{R.id.text1};
-		StatusAdapter adapter = new StatusAdapter(HomeActivity.this, R.layout.list_item_layout, cursor,
+		adapter = new StatusAdapter(HomeActivity.this, R.layout.list_item_layout, cursor,
 				from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
 		ListView listView = (ListView) findViewById(R.id.listView1);
 		listView.setAdapter(adapter);
 	}
 
-	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		stopManagingCursor(adapter.getCursor());
+		adapter.getCursor().close();
+        db.close();
+	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		db.close();
 	}
 
 

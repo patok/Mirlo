@@ -21,18 +21,6 @@
         android:layout_marginTop="26dp"
         tools:text="auth URL" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:text="Name"
-        android:ems="10"
-        android:layout_below="@+id/auth_launch_button"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="73dp"
-        android:id="@+id/pin"
-        android:hint="Insert PIN" />
-
     <Button
         android:text="1 - Lanzar autorización"
         android:layout_width="wrap_content"
@@ -44,7 +32,7 @@
         android:enabled="false" />
 
     <Button
-        android:text="2 - Guardar Pin"
+        android:text="3 - Guardar Pin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
@@ -52,4 +40,15 @@
         android:layout_below="@+id/pin"
         android:layout_centerHorizontal="true"
         android:enabled="false" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:layout_marginTop="72dp"
+        android:id="@+id/pin"
+        android:hint="2 - Insertar PIN"
+        android:layout_below="@+id/auth_launch_button"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

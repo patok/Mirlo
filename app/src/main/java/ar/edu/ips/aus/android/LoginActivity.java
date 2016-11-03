@@ -46,6 +46,7 @@ public class LoginActivity extends Activity {
                 MirloApplication app = (MirloApplication) getApplication();
                 String pin = pinView.getText().toString();
                 app.retrieveUserAccessToken(pin);
+                LoginActivity.this.finish();
             }
         });
 
