@@ -44,6 +44,9 @@ public class MirloService extends Service {
 		Log.d(TAG , "Mirlo Service destroyed");
 	}
 
+	// TODO manage auth errors
+	// TODO proper cursor handling from adapter?
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);

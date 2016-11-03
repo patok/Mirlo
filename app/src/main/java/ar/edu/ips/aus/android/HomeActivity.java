@@ -80,22 +80,21 @@ public class HomeActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.menu_preferences:
-			// calling PrefsActivity explicitly!
-			Intent prefsIntent = new Intent(this, PrefsActivity.class);
-			startActivity(prefsIntent);
-			return true;
-		case R.id.menu_refresh:
-			// refresh data
-			return true;
-		case R.id.menu_service_start:
-			startService(new Intent(this, MirloService.class));
-			return true;
-		case R.id.menu_service_stop:
-			stopService(new Intent(this, MirloService.class));
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.menu_login:
+				Intent loginIntent = new Intent(this, LoginActivity.class);
+				startActivity(loginIntent);
+				return true;
+			case R.id.menu_refresh:
+				// refresh data
+				return true;
+			case R.id.menu_service_start:
+				startService(new Intent(this, MirloService.class));
+				return true;
+			case R.id.menu_service_stop:
+				stopService(new Intent(this, MirloService.class));
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
